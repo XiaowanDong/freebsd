@@ -567,7 +567,7 @@ index 1d18823..b63fd87 100644
  void		 pmap_advise(pmap_t pmap, vm_offset_t sva, vm_offset_t eva,
  		    int advice);
 diff --git a/sys/vm/vm_fault.c b/sys/vm/vm_fault.c
-index 050ddddaa..db60988 100644
+index 050ddddaa..795fb4c 100644
 --- a/sys/vm/vm_fault.c
 +++ b/sys/vm/vm_fault.c
 @@ -292,8 +292,12 @@ vm_fault_hold(vm_map_t map, vm_offset_t vaddr, vm_prot_t fault_type,
@@ -585,7 +585,7 @@ index 050ddddaa..db60988 100644
  	u_char behavior;
  
  	hardfault = 0;
-@@ -381,7 +385,46 @@ RetryFault:;
+@@ -381,9 +385,48 @@ RetryFault:;
  		if (m == NULL || ((prot & VM_PROT_WRITE) != 0 &&
  		    vm_page_busied(m)) || m->valid != VM_PAGE_BITS_ALL)
  			goto fast_failed;
@@ -631,8 +631,11 @@ index 050ddddaa..db60988 100644
 +#endif
 +                result = pmap_enter(fs.map->pmap, vaddr, m_map, prot, 
  		   fault_type | PMAP_ENTER_NOSLEEP | (wired ? PMAP_ENTER_WIRED :
- 		   0), 0);
+-		   0), 0);
++		   0), psind);
  		if (result != KERN_SUCCESS)
+ 			goto fast_failed;
+ 		if (m_hold != NULL) {
 @@ -395,7 +438,7 @@ RetryFault:;
  		vm_fault_dirty(fs.entry, m, prot, fault_type, fault_flags,
  		    FALSE);
